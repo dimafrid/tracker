@@ -1,0 +1,63 @@
+AT A GLANCE
+This library is not a substitute for profiler. However, when it's impossible to connect with profiler (production/customer site/whatever),
+tracker provides a great insight on what your application is doing right now, your applicative call stack, 
+how much time it takes, what the most called methods are, etc. etc.
+
+Tracking data can be accessed programmatically via TrackerFactory. The library also provides a JMX which shows tracking data:
+
+Applicative threads and call stacks example - 
+
+Tracker: Default
+"demo-thr" Id=12 TIMED_WAITING
+	java.lang.Thread.sleep(Native Method)
+	org.drift.tracker.utils.ThreadUtils.sleep(ThreadUtils.java:168)
+	org.drift.tracker.DemoClass.midLevelCall_aroundBody2(DemoClass.java:19)
+	org.drift.tracker.DemoClass$AjcClosure3.run(DemoClass.java:1)
+	org.aspectj.runtime.reflect.JoinPointImpl.proceed(JoinPointImpl.java:149)
+	org.drift.tracker.aop.MonitoringAspect.monitor(MonitoringAspect.java:36)
+	org.drift.tracker.DemoClass.midLevelCall(DemoClass.java:19)
+	org.drift.tracker.DemoClass.topLevelCall_aroundBody0(DemoClass.java:13)
+	org.drift.tracker.DemoClass$AjcClosure1.run(DemoClass.java:1)
+	org.aspectj.runtime.reflect.JoinPointImpl.proceed(JoinPointImpl.java:149)
+	org.drift.tracker.aop.MonitoringAspect.monitor(MonitoringAspect.java:36)
+	org.drift.tracker.DemoClass.topLevelCall(DemoClass.java:12)
+	org.drift.tracker.DemoApp$1.run(DemoApp.java:25)
+	java.lang.Thread.run(Thread.java:619)
+
+Calls:
+	Time: started at 2011-06-08 16:06:04.546, elapsed: 60360 ms
+	Call: DemoClass.topLevelCall
+
+	Time: started at 2011-06-08 16:06:05.562, elapsed: 59359 ms
+	Call: DemoClass.midLevelCall
+
+Call statistics example -
+
+Call: DemoClass.midLevelCall => invocations: N, total elapsed: ..., average elapsed: ..., max elapsed: ...
+Call: DemoClass.topLevelCall => invocations: M, total elapsed: ..., average elapsed: ..., max elapsed: ...
+
+HOW IT WORKS
+Tracker is using load-time weaving to instrument classes with methods you choose to track.
+
+To incorporate tracker in your application:
+1. Specify a javaagent. For example: -javaagent:<your lib dir>/org/aspectj/aspectjweaver/1.6.7/aspectjweaver-1.6.7.jar
+2. Annotate the methods you wish to track with @Monitored
+3. Configure your AOP (see AOP section below)
+
+See tiny demo application (org.drift.tracker.DemoApp) example. You can configure sleep intervals via VM args for your convenience.
+
+You can also track methods programmatically. See the org.drift.tracker.examples.AbstractPerfMonitoringFilter example.
+
+AOP
+Configure your weaving in aop.xml by adding
+	<include within="<your-package-name..*" />
+section to aop.xml
+
+If you use Spring, annotate MonitoringAspect class with @Component.
+You will probably need to adjust the library to your Spring AOP configuration. If it's a standard proxy-based AOP,
+you're good to go and can even throw away the aop.xml.
+
+Spring also provides its own instrumentation agent.
+
+LOGGING
+The library is not integrated with any particular logger. Choose any logger you like and add pieces of logging, for example in org.drift.tracker.aop.MonitoringAspect:45
