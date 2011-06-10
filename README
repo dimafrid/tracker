@@ -36,6 +36,8 @@ Call statistics example -
 Call: DemoClass.midLevelCall => invocations: N, total elapsed: ..., average elapsed: ..., max elapsed: ...
 Call: DemoClass.topLevelCall => invocations: M, total elapsed: ..., average elapsed: ..., max elapsed: ...
 
+You can use jconsole (not the best job Sun ever did ...) or incorporate this lovely JMX web console written in Groovy (https://github.com/rimar/groovy-jmx-console) in your application.
+
 HOW IT WORKS
 Tracker is using load-time weaving to instrument classes with methods you choose to track.
 
